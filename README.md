@@ -4,6 +4,11 @@ Two hand-coded websites built as coursework for **Human-Computer Interaction**, 
 
 No frameworks. No build step. No dependencies. Just HTML, CSS, and vanilla JavaScript — so the principles demonstrated are *in* the code you can read.
 
+### 🔗 Live sites
+
+- **Field Lab** → [yashvigala.github.io/HCI/lab/](https://yashvigala.github.io/HCI/lab/)
+- **Editorial Portfolio** → [yashvigala.github.io/HCI/portfolio/](https://yashvigala.github.io/HCI/portfolio/)
+
 ---
 
 ## `lab/` — Field Lab
