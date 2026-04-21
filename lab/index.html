@@ -1,0 +1,1738 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Field Lab — Interactive HCI Principles · 06.103.115</title>
+<meta name="description" content="An interactive companion to the IIT-Guwahati Human-Computer Interaction course. Don't read about HCI — touch it." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,500&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0B0E;
+    --ink-2:#13131A;
+    --ink-3:#1B1B24;
+    --paper:#E8E6DD;
+    --paper-dim:#A39E92;
+    --rule:#2A2A35;
+    --amber:#E8B547;
+    --amber-dim:#7a5d23;
+    --mint:#5DBFA9;
+    --rose:#E97070;
+    --violet:#B68FE0;
+    --grid: rgba(232,230,221,0.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink);color:var(--paper);}
+  body{
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(232,181,71,0.04), transparent 60%),
+      radial-gradient(circle at 80% 90%, rgba(93,191,169,0.04), transparent 55%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+  }
+  ::selection{background:var(--amber);color:var(--ink)}
+  a{color:inherit;text-decoration:none}
+
+  /* Typography */
+  .serif{font-family:"Fraunces", "Times New Roman", serif; font-feature-settings:"ss01","ss02";}
+  .ital{font-style:italic;}
+  .mono{font-family:"JetBrains Mono",monospace;}
+  .label{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);}
+  .display{font-family:"Fraunces",serif;font-weight:400;letter-spacing:-.02em;line-height:.95;}
+
+  /* Layout */
+  .wrap{max-width: 1240px; margin:0 auto; padding: 0 32px;}
+  section{position:relative; padding: 100px 0 80px; border-top:1px solid var(--rule);}
+  section:first-of-type{border-top:none}
+  .grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;}
+  .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-9{grid-column:span 9}.col-12{grid-column:span 12}
+
+  /* Top bar */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 14px 32px;
+    backdrop-filter: blur(10px) saturate(120%);
+    background: rgba(11,11,14,0.65);
+    border-bottom:1px solid var(--rule);
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .topbar .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);display:inline-block;margin-right:8px;animation:blink 2s infinite;}
+  @keyframes blink{50%{opacity:.3}}
+  .topbar nav a{margin-left:24px}
+  .topbar nav a:hover{color:var(--amber)}
+
+  /* Hero */
+  .hero{padding: 220px 0 160px; position:relative; overflow:hidden;}
+  .hero h1{font-size: clamp(60px, 10vw, 168px);}
+  .hero h1 .em{color:var(--amber); font-style:italic;}
+  .hero .cursor{display:inline-block;width:.55ch;height:.85em;background:var(--amber);vertical-align:-12%;margin-left:6px;animation:blink 1.1s steps(1,end) infinite;box-shadow:0 0 24px var(--amber);}
+  .hero .lede{margin-top: 56px; max-width: 640px; color:var(--paper-dim); font-size:15px;}
+  .hero .meta{position:absolute; right:32px; top:140px; text-align:right; color:var(--paper-dim);}
+  .hero .meta b{color:var(--paper); font-weight:500;}
+  .hero .ascii{
+    position:absolute; left:-20px; bottom:30px; font-size:10px; line-height:1.05;
+    color:var(--mint); opacity:.35; white-space:pre; font-family:"JetBrains Mono",monospace;
+    pointer-events:none;
+  }
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);}
+  .pill::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mint);}
+
+  /* Section header */
+  .sec-h{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:48px;}
+  .sec-h .num{font-family:"JetBrains Mono",monospace;color:var(--amber);font-size:13px;letter-spacing:.2em;}
+  .sec-h h2{font-family:"Fraunces",serif;font-weight:400;font-size: clamp(36px,5vw,72px);line-height:1; letter-spacing:-.02em;}
+  .sec-h h2 i{color:var(--amber);}
+  .sec-h .law{max-width:380px;color:var(--paper-dim);font-size:13px;text-align:right;}
+  .sec-h .law code{display:block;color:var(--mint); margin-top:8px;font-size:13px;}
+
+  /* Card */
+  .card{background:linear-gradient(180deg, var(--ink-2), var(--ink)); border:1px solid var(--rule); border-radius:6px; padding:28px; position:relative;}
+  .card .corner{position:absolute; top:10px; right:14px; font-size:10px; letter-spacing:.2em; color:var(--paper-dim);}
+  .figcap{margin-top:14px;color:var(--paper-dim);font-size:12px;display:flex;justify-content:space-between;}
+  .figcap b{color:var(--amber);font-weight:500;}
+
+  /* Buttons & inputs */
+  button.btn, .btn{
+    background:transparent;border:1px solid var(--rule); color:var(--paper);
+    padding:10px 16px; font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+    cursor:pointer; transition: all .15s ease; border-radius:4px;
+  }
+  .btn:hover{border-color:var(--amber);color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber);}
+  .btn.amber{background:var(--amber);color:var(--ink);border-color:var(--amber);}
+  .btn.amber:hover{background:transparent;color:var(--amber);}
+  .btn.ghost{color:var(--paper-dim);}
+  input[type=range]{ -webkit-appearance:none; width:100%; background:transparent;}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--rule);}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:14px;width:14px;border-radius:50%;background:var(--amber);margin-top:-6px;box-shadow:0 0 10px var(--amber-dim);}
+  input[type=color]{border:1px solid var(--rule);background:transparent;width:60px;height:40px;cursor:pointer;border-radius:4px;}
+  .kv{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:13px;}
+  .kv dt{color:var(--paper-dim);}
+  .readout{font-family:"JetBrains Mono",monospace;color:var(--amber);font-variant-numeric:tabular-nums;}
+
+  /* Toggle */
+  .switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--paper-dim);}
+  .switch .track{width:32px;height:16px;background:var(--ink-3);border:1px solid var(--rule);border-radius:999px;position:relative;transition:.2s;}
+  .switch .track::after{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;background:var(--paper-dim);border-radius:50%;transition:.2s;}
+  .switch input{display:none;}
+  .switch input:checked + .track{background:var(--amber); border-color:var(--amber);}
+  .switch input:checked + .track::after{left:17px;background:var(--ink);}
+
+  /* Specific demos */
+  .stage{position:relative; background:var(--ink); border:1px dashed var(--rule); border-radius:4px; overflow:hidden;}
+  svg{display:block;}
+
+  /* Heuristics grid */
+  .h-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .h-card{padding:18px;border:1px solid var(--rule);border-radius:4px;cursor:pointer;transition:.15s;background:var(--ink-2);}
+  .h-card:hover{border-color:var(--amber);transform:translateY(-2px);}
+  .h-card .n{color:var(--amber);font-size:11px;letter-spacing:.2em;}
+  .h-card h4{font-family:"Fraunces",serif;font-weight:400;font-size:18px;margin:6px 0;}
+  .h-card p{color:var(--paper-dim);font-size:12px;}
+  .h-modal{position:fixed;inset:0;background:rgba(11,11,14,.85);display:none;align-items:center;justify-content:center;z-index:90;backdrop-filter:blur(8px);}
+  .h-modal.open{display:flex;}
+  .h-modal .panel{max-width:780px;width:90%;background:var(--ink-2);border:1px solid var(--amber);border-radius:6px;padding:32px;}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px;}
+  .ba .b{border:1px solid var(--rule);border-radius:4px;padding:18px;background:var(--ink);}
+  .ba .b.bad{border-color:#5a2828;}
+  .ba .b.good{border-color:#2c5a4a;}
+  .ba .b .tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;}
+  .ba .b.bad .tag{color:var(--rose);}
+  .ba .b.good .tag{color:var(--mint);}
+
+  /* KLM */
+  /* KLM rebuilt */
+  .klm-ops{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .klm-op{
+    display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+    padding:10px 14px 10px 20px;background:var(--ink-2);
+    border:1px solid var(--rule);border-radius:4px;cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .2s ease;
+    min-width:140px;text-align:left;position:relative;overflow:hidden;
+  }
+  .klm-op::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:var(--rule);transition:.2s;
+  }
+  .klm-op[data-op=K]::before{background:var(--amber);}
+  .klm-op[data-op=P]::before{background:var(--mint);}
+  .klm-op[data-op=H]::before{background:var(--violet);}
+  .klm-op[data-op=M]::before{background:var(--rose);}
+  .klm-op[data-op=R]::before{background:#9DC8E8;}
+  .klm-op:hover{border-color:var(--amber);transform:translateY(-2px);}
+  .klm-op:hover::before{width:6px;}
+  .klm-op.hit{animation:hit .5s ease;}
+  @keyframes hit{
+    0%{background:var(--ink-2);}
+    30%{background:rgba(232,181,71,.18);border-color:var(--amber);transform:translateY(-2px) scale(1.02);}
+    100%{background:var(--ink-2);}
+  }
+  .klm-op .lt{font-family:"Fraunces",serif;font-style:italic;font-size:24px;line-height:1;font-weight:400;}
+  .klm-op .nm{font-size:11px;color:var(--paper);margin-top:4px;letter-spacing:.05em;}
+  .klm-op .cost{font-size:10px;color:var(--amber);font-variant-numeric:tabular-nums;letter-spacing:.05em;}
+  .klm-op .ex{font-size:10px;color:var(--paper-dim);margin-top:1px;font-style:italic;}
+  .klm-op[data-op=K] .lt{color:var(--amber);}
+  .klm-op[data-op=P] .lt{color:var(--mint);}
+  .klm-op[data-op=H] .lt{color:var(--violet);}
+  .klm-op[data-op=M] .lt{color:var(--rose);}
+  .klm-op[data-op=R] .lt{color:#9DC8E8;}
+
+  .klm-tl{
+    min-height:110px;padding:18px 14px 14px;border:1px dashed var(--rule);border-radius:4px;
+    display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;
+    background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  }
+  .klm-tl .empty{color:var(--paper-dim);font-size:12px;font-style:italic;align-self:center;margin:0 auto;}
+  .klm-tl .tok{
+    background:var(--ink-3);border:1px solid var(--rule);border-radius:4px;
+    padding:8px 6px 6px;min-width:78px;text-align:center;position:relative;
+    animation:tokIn .25s ease-out;
+  }
+  @keyframes tokIn{from{transform:translateY(-6px) scale(.9);opacity:0;}to{transform:none;opacity:1;}}
+  .klm-tl .tok .num{
+    position:absolute;top:-8px;left:-6px;font-size:9px;color:var(--paper-dim);
+    background:var(--ink);padding:1px 5px;border-radius:99px;border:1px solid var(--rule);
+  }
+  .klm-tl .tok .lt{font-family:"Fraunces",serif;font-style:italic;font-size:28px;line-height:1;font-weight:400;}
+  .klm-tl .tok[data-op=K] .lt{color:var(--amber);}
+  .klm-tl .tok[data-op=P] .lt{color:var(--mint);}
+  .klm-tl .tok[data-op=H] .lt{color:var(--violet);}
+  .klm-tl .tok[data-op=M] .lt{color:var(--rose);}
+  .klm-tl .tok[data-op=R] .lt{color:#9DC8E8;}
+  .klm-tl .tok .add{font-size:10px;color:var(--paper-dim);margin-top:4px;letter-spacing:.05em;font-variant-numeric:tabular-nums;}
+  .klm-tl .tok .cum{
+    font-size:11px;color:var(--amber);margin-top:3px;font-variant-numeric:tabular-nums;
+    border-top:1px dashed var(--rule);padding-top:3px;
+  }
+  .klm-tl .tok.last{box-shadow:0 0 0 1px var(--amber);border-color:var(--amber);}
+
+  .klm-ctrl{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
+  /* time-breakdown bar */
+  .klm-bar-wrap{
+    margin-top:18px;padding:18px 20px;
+    border:1px solid var(--rule);border-radius:4px;
+    background:var(--ink-2);
+    display:none;
+  }
+  .klm-bar-wrap.on{display:block;animation:tokIn .35s ease-out;}
+  .klm-bar-wrap .tit{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim);
+    margin-bottom:10px;
+  }
+  .klm-bar-wrap .tit .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:18px;
+    color:var(--amber);letter-spacing:0;text-transform:none;
+  }
+  .klm-bar{
+    height:14px;display:flex;gap:2px;background:var(--ink);
+    border-radius:2px;overflow:hidden;border:1px solid var(--rule);
+  }
+  .klm-bar .seg{height:100%;transition:width .35s ease;position:relative;}
+  .klm-bar .seg[data-op=K]{background:var(--amber);}
+  .klm-bar .seg[data-op=P]{background:var(--mint);}
+  .klm-bar .seg[data-op=H]{background:var(--violet);}
+  .klm-bar .seg[data-op=M]{background:var(--rose);}
+  .klm-bar .seg[data-op=R]{background:#9DC8E8;}
+  .klm-legend{
+    display:flex;gap:18px;margin-top:12px;flex-wrap:wrap;
+    font-size:11px;color:var(--paper-dim);font-variant-numeric:tabular-nums;
+    font-family:"JetBrains Mono",monospace;
+  }
+  .klm-legend .li{display:flex;align-items:center;gap:8px;}
+  .klm-legend .li .d{width:10px;height:10px;border-radius:2px;}
+  .klm-legend .li[data-op=K] .d{background:var(--amber);}
+  .klm-legend .li[data-op=P] .d{background:var(--mint);}
+  .klm-legend .li[data-op=H] .d{background:var(--violet);}
+  .klm-legend .li[data-op=M] .d{background:var(--rose);}
+  .klm-legend .li[data-op=R] .d{background:#9DC8E8;}
+  .klm-legend .li .pct{color:var(--paper-dim);}
+
+  .scen-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
+  @media (max-width:880px){.scen-row{grid-template-columns:1fr;}}
+  .scen{
+    background:linear-gradient(180deg, var(--ink-2), var(--ink));
+    border:1px solid var(--rule);color:var(--paper);
+    font-family:"JetBrains Mono",monospace;padding:16px 18px;cursor:pointer;
+    border-radius:4px;font-size:12px;text-align:left;
+    transition:.2s;
+    display:flex;flex-direction:column;gap:8px;
+    position:relative;overflow:hidden;
+  }
+  .scen:hover{border-color:var(--mint);transform:translateY(-2px);}
+  .scen::after{
+    content:"▸";position:absolute;top:16px;right:18px;
+    color:var(--paper-dim);font-size:14px;transition:.2s;
+  }
+  .scen:hover::after{color:var(--mint);transform:translateX(3px);}
+  .scen .scen-t{
+    font-family:"Fraunces",serif;font-style:italic;color:var(--paper);
+    font-size:18px;font-weight:400;line-height:1.15;padding-right:20px;
+  }
+  .scen .scen-d{
+    color:var(--paper-dim);font-size:10px;letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  .scen .mix{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:4px;}
+  .scen .mix .dot{
+    font-size:10px;padding:3px 7px;border-radius:99px;letter-spacing:.04em;
+    font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  }
+  .scen .mix .dot[data-op=K]{background:rgba(232,181,71,.15);color:var(--amber);}
+  .scen .mix .dot[data-op=P]{background:rgba(93,191,169,.15);color:var(--mint);}
+  .scen .mix .dot[data-op=H]{background:rgba(182,143,224,.15);color:var(--violet);}
+  .scen .mix .dot[data-op=M]{background:rgba(233,112,112,.15);color:var(--rose);}
+  .scen .mix .dot[data-op=R]{background:rgba(157,200,232,.15);color:#9DC8E8;}
+  .scen.playing{border-color:var(--mint);background:rgba(93,191,169,.05);}
+  .scen.playing::after{content:"▶";color:var(--mint);animation:blink 1s infinite;}
+
+  /* step progress pips */
+  .scen-progress{display:flex;gap:3px;margin-top:12px;}
+  .scen-progress .pip{
+    flex:1;height:3px;background:var(--rule);border-radius:2px;transition:background .3s;
+  }
+  .scen-progress .pip.on{background:var(--mint);}
+  .scen-progress .pip.cur{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+
+  .scen-explain{
+    margin-top:14px;padding:18px;background:var(--ink-2);
+    border:1px solid var(--rule);border-radius:4px;min-height:88px;
+  }
+  .scen-explain .empty{color:var(--paper-dim);font-size:12px;font-style:italic;}
+  .scen-explain .step{display:flex;align-items:flex-start;gap:16px;}
+  .scen-explain .step .glyph{
+    font-family:"Fraunces",serif;font-style:italic;font-size:48px;line-height:1;
+    width:78px;height:78px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;flex:0 0 78px;
+  }
+  .scen-explain .step .glyph[data-op=K]{background:rgba(232,181,71,.12);color:var(--amber);}
+  .scen-explain .step .glyph[data-op=P]{background:rgba(93,191,169,.12);color:var(--mint);}
+  .scen-explain .step .glyph[data-op=H]{background:rgba(182,143,224,.12);color:var(--violet);}
+  .scen-explain .step .glyph[data-op=M]{background:rgba(233,112,112,.12);color:var(--rose);}
+  .scen-explain .step .glyph[data-op=R]{background:rgba(157,200,232,.12);color:#9DC8E8;}
+  .scen-explain .step .text{flex:1;}
+  .scen-explain .step .meta{font-size:10px;letter-spacing:.18em;color:var(--paper-dim);text-transform:uppercase;}
+  .scen-explain .step .why{font-size:15px;color:var(--paper);line-height:1.45;margin-top:6px;}
+  .scen-explain .step .num{font-size:11px;color:var(--amber);margin-top:6px;font-variant-numeric:tabular-nums;}
+  .scen-explain .done{font-family:"Fraunces",serif;font-style:italic;font-size:24px;color:var(--mint);}
+  .scen-explain .done small{display:block;font-style:normal;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--paper-dim);letter-spacing:.1em;text-transform:uppercase;margin-top:6px;}
+
+  .klm-total-big{
+    background:var(--ink-2);border:1px solid var(--rule);border-radius:4px;
+    padding:14px 18px;margin-left:auto;display:flex;align-items:baseline;gap:12px;
+  }
+  .klm-total-big .lab{font-size:11px;letter-spacing:.18em;color:var(--paper-dim);text-transform:uppercase;}
+  .klm-total-big .v{font-family:"Fraunces",serif;font-style:italic;font-size:32px;color:var(--amber);line-height:1;font-variant-numeric:tabular-nums;}
+
+  /* split layout for KLM laboratory */
+  .klm-split{
+    display:grid;grid-template-columns: 1.5fr 1fr;gap:28px;margin-top:22px;
+    align-items:stretch;
+  }
+  .klm-col-main, .klm-col-side{display:flex;flex-direction:column;gap:14px;min-width:0;}
+  .klm-side-head{
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--paper-dim);padding-bottom:10px;border-bottom:1px solid var(--rule);
+    display:flex;justify-content:space-between;align-items:baseline;
+  }
+  .klm-side-head .hint{color:var(--amber-dim);letter-spacing:.05em;text-transform:none;font-style:italic;font-family:"Fraunces",serif;font-size:13px;}
+  .klm-col-side .scen-explain{margin-top:0;min-height:160px;transition:border-color .3s, box-shadow .3s;}
+  .klm-col-side .scen-explain.live{
+    border-color:var(--mint);
+    box-shadow:0 0 0 1px var(--mint), 0 0 30px rgba(93,191,169,.06);
+  }
+  .klm-col-side .scen-row{
+    display:flex;flex-direction:column;gap:8px;margin:0;
+  }
+  .klm-col-side .scen{padding:14px 16px;gap:6px;}
+  .klm-col-side .scen .scen-t{font-size:16px;}
+
+  @media (max-width: 1024px){
+    .klm-split{grid-template-columns:1fr;}
+  }
+
+  /* Accessibility sim */
+  .a11y-frame{padding:24px;border:1px solid var(--rule);border-radius:4px;background:var(--ink-2);}
+  .a11y-frame .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .a11y-frame input[type=text]{padding:10px;background:var(--ink);border:1px solid var(--rule);color:var(--paper);font-family:inherit;border-radius:3px;}
+  .a11y-frame input[type=text]:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(232,181,71,.2);}
+  .a11y-frame.hc{filter:contrast(1.45) saturate(0);}
+  .sr-log{height:160px;overflow-y:auto;padding:14px;border:1px solid var(--rule);border-radius:4px;background:#000;font-size:12px;line-height:1.7;color:var(--mint);}
+
+  /* Heuristic mockups inside modal */
+  .mock{background:#FBF7EE;color:#1A1410;border-radius:4px;padding:14px;font-family:"JetBrains Mono",monospace;font-size:11px;min-height:160px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+  .mock.dark{background:#0E0E14;color:#E8E6DD;}
+  .mock .mbtn{display:inline-block;padding:8px 14px;border-radius:3px;font-size:11px;letter-spacing:.08em;cursor:default;}
+  .mock .mbtn.pri{background:#1A1410;color:#FBF7EE;}
+  .mock .mbtn.gho{background:transparent;border:1px solid #1A1410;color:#1A1410;}
+  .mock .mbtn.dng{background:#B23A3A;color:#fff;}
+  .mock .mbtn.ok{background:#3A8A6E;color:#fff;}
+  .mock .mfield{background:#fff;border:1px solid #C9BFA8;padding:7px 10px;font-size:11px;border-radius:3px;}
+  .mock .mfield.err{border-color:#B23A3A;background:#FFF1F1;}
+  .mock .mlabel{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8B7E6A;}
+  .mock .merr{background:#B23A3A;color:#fff;padding:7px 10px;border-radius:3px;font-size:11px;}
+  .mock .merr.soft{background:#FFE9E0;color:#8C2A14;border:1px solid #E9B49E;}
+  .mock .mchip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;background:#E8E0CC;border-radius:99px;font-size:10px;color:#1A1410;}
+  .mock .mchip.act{background:#1A1410;color:#FBF7EE;}
+  .mock .mtag{display:inline-block;padding:2px 6px;border-radius:2px;font-size:9px;letter-spacing:.15em;}
+  .mock .mok{display:inline-flex;align-items:center;gap:6px;color:#3A8A6E;font-size:11px;}
+  .mock .mdot{width:6px;height:6px;border-radius:50%;background:#3A8A6E;}
+  .mock .mrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .mock .mcrumb{font-size:10px;color:#8B7E6A;}
+  .mock .mcrumb b{color:#1A1410;}
+  .mock .mtoolbar{display:flex;gap:4px;flex-wrap:wrap;}
+  .mock .mtile{flex:1 0 22%;background:#fff;border:1px solid #C9BFA8;padding:6px;font-size:9px;text-align:center;}
+  .mock .mtile.lg{flex:1 0 30%;padding:14px;}
+  .mock .mtile .v{font-family:"Fraunces",serif;font-style:italic;font-size:24px;color:#6B2424;}
+  .mock .mtile .k{font-size:8px;letter-spacing:.16em;color:#8B7E6A;text-transform:uppercase;margin-top:3px;}
+  .mock .term{background:#0B0B0E;color:#E8B547;font-family:"JetBrains Mono",monospace;font-size:10px;padding:8px;border-radius:3px;}
+  .mock .term .pr{color:#5DBFA9;}
+  .mock .palette{background:#1A1410;color:#FBF7EE;padding:10px;border-radius:4px;}
+  .mock .palette .q{font-family:"JetBrains Mono",monospace;font-size:11px;border-bottom:1px solid #3A3128;padding-bottom:6px;margin-bottom:6px;}
+  .mock .palette .opt{padding:4px 0;font-size:10px;color:#C9BFA8;}
+  .mock .palette .opt.sel{color:#E8B547;}
+  .mock .pdf{background:#fff;border:1px solid #C9BFA8;padding:14px;display:flex;align-items:center;gap:10px;}
+  .mock .pdf .ic{width:34px;height:42px;background:linear-gradient(180deg,#fff 0%,#fff 80%,#C9BFA8 80%,#C9BFA8 100%);border:1px solid #1A1410;display:flex;align-items:flex-end;justify-content:center;font-size:8px;font-weight:700;padding-bottom:2px;}
+  .mock .tip{background:#1A1410;color:#FBF7EE;padding:8px 10px;border-radius:3px;font-size:10px;position:relative;}
+  .mock .tip::after{content:"";position:absolute;top:-5px;left:18px;border:5px solid transparent;border-bottom-color:#1A1410;border-top:none;}
+  .mock .progress{display:flex;gap:4px;align-items:center;font-size:9px;letter-spacing:.18em;color:#8B7E6A;}
+  .mock .progress .seg{width:18px;height:3px;background:#C9BFA8;}
+  .mock .progress .seg.on{background:#1A1410;}
+  .mock .stove-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;}
+  .mock .stove-grid .c{background:#fff;border:1px solid #C9BFA8;padding:4px;font-size:8px;text-align:center;color:#1A1410;}
+  .mock .pulse{width:14px;height:14px;border:2px solid #8B7E6A;border-top-color:#1A1410;border-radius:50%;display:inline-block;animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .mock .stuck{font-size:11px;color:#8B7E6A;font-style:italic;}
+
+  /* footer */
+  footer{padding:80px 0 40px;border-top:1px solid var(--rule); color:var(--paper-dim); font-size:12px;}
+  footer a:hover{color:var(--amber);}
+  .cite{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:32px 0;}
+  .cite div{padding:14px;border-left:2px solid var(--amber);}
+  .cite b{color:var(--paper);font-family:"Fraunces",serif;font-weight:400;font-style:italic;font-size:16px;display:block;margin-bottom:4px;}
+
+  /* reveal on scroll */
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease, transform .8s ease;}
+  .rv.in{opacity:1;transform:none;}
+
+  @media (max-width: 880px){
+    .grid12{grid-template-columns:repeat(6,1fr);}
+    .col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9{grid-column:span 6;}
+    .hero{padding:160px 0 80px;}
+    .hero .meta{position:static; text-align:left; margin-top:32px;}
+    .h-grid{grid-template-columns:1fr;}
+    .cite{grid-template-columns:1fr;}
+    .ba{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div><span class="dot"></span>FIELD&nbsp;LAB &nbsp;·&nbsp; signal nominal</div>
+  <nav>
+    <a href="#fitts">Fitts</a>
+    <a href="#hicks">Hick</a>
+    <a href="#gestalt">Gestalt</a>
+    <a href="#norman">Norman</a>
+    <a href="#nielsen">Nielsen</a>
+    <a href="#klm">KLM</a>
+    <a href="#color">Color</a>
+    <a href="#a11y">A11y</a>
+  </nav>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <h1 class="display rv">
+      Don't <span class="em">read</span><br/>
+      about HCI.<br/>
+      <span class="em ital">Touch&nbsp;it</span><span class="cursor"></span>
+    </h1>
+    <p class="lede rv">
+      A field laboratory of the principles your textbook describes. Every section below is a working
+      instrument — drag the targets, race the menus, fix the broken UI, narrate a screen reader. The
+      site itself is the proof you understood the material.
+    </p>
+
+    <div class="meta label">
+      <div>v1.0 · APR 2026</div>
+      <div style="margin-top:6px"><b>10</b> instruments</div>
+      <div style="margin-top:6px"><b>0</b> dependencies</div>
+      <div style="margin-top:32px;color:var(--mint);">— scroll —</div>
+    </div>
+  </div>
+  <pre class="ascii">
+    ┌──────────────────────────────────────┐
+    │  ╱╲    ╱╲    ╱╲    ╱╲    ╱╲    ╱╲   │
+    │ ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  │
+    │╱    ╲╱    ╲╱    ╲╱    ╲╱    ╲╱    ╲ │
+    └──────────────────────────────────────┘</pre>
+</header>
+
+<!-- 01 FITTS -->
+<section id="fitts">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 01 / INSTRUMENT</div>
+        <h2>Fitts's <i>Law</i></h2>
+      </div>
+      <div class="law">
+        Time to acquire a target is a function of distance and width.
+        <code>MT = a + b · log₂(D/W + 1)</code>
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-8 rv">
+        <div class="card">
+          <div class="corner">FIG. 1.1 · CLICK PLAYGROUND</div>
+          <div class="stage" style="height:340px;">
+            <svg id="fitts-svg" viewBox="0 0 800 340" width="100%" height="340">
+              <defs>
+                <radialGradient id="g1"><stop offset="0%" stop-color="#E8B547"/><stop offset="100%" stop-color="#7a5d23"/></radialGradient>
+              </defs>
+              <line id="fitts-line" x1="120" y1="170" x2="680" y2="170" stroke="#2A2A35" stroke-dasharray="4 6"/>
+              <circle id="fitts-a" cx="120" cy="170" r="16" fill="url(#g1)"/>
+              <circle id="fitts-b" cx="680" cy="170" r="40" fill="#5DBFA9"/>
+              <text id="fitts-instr" x="400" y="40" fill="#A39E92" font-family="JetBrains Mono" font-size="12" text-anchor="middle">click amber, then mint — as fast as you can</text>
+              <text id="fitts-result" x="400" y="310" fill="#E8B547" font-family="JetBrains Mono" font-size="13" text-anchor="middle"></text>
+            </svg>
+          </div>
+          <div class="figcap"><span>fig. 1.1 — interactive target</span><span><b id="fitts-trial">trial 0</b> · <span id="fitts-actual">— ms</span></span></div>
+        </div>
+      </div>
+
+      <div class="col-4 rv">
+        <div class="card" style="height:100%;">
+          <div class="corner">CONTROLS</div>
+          <h3 class="serif" style="font-size:24px;font-weight:400;margin-bottom:18px;">Predict the cost.</h3>
+
+          <div style="margin-bottom:18px">
+            <div class="label">distance D <span id="fittsD-v" class="readout" style="float:right">560 px</span></div>
+            <input type="range" id="fittsD" min="120" max="700" value="560"/>
+          </div>
+          <div style="margin-bottom:18px">
+            <div class="label">width W <span id="fittsW-v" class="readout" style="float:right">80 px</span></div>
+            <input type="range" id="fittsW" min="12" max="140" value="80"/>
+          </div>
+
+          <dl class="kv" style="margin-top:24px;border-top:1px solid var(--rule);padding-top:18px;">
+            <dt>log₂(D/W+1)</dt><dd class="readout" id="fitts-id">—</dd>
+            <dt>predicted MT</dt><dd class="readout" id="fitts-pred">—</dd>
+            <dt>your MT</dt><dd class="readout" id="fitts-you">—</dd>
+          </dl>
+
+          <p style="color:var(--paper-dim);font-size:12px;margin-top:18px;">
+            Big targets, close by, are cheap. Small targets, far away, cost dearly. Place the most-used
+            buttons where the user already is.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 HICK -->
+<section id="hicks">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 02 / INSTRUMENT</div>
+        <h2>Hick's <i>Law</i></h2>
+      </div>
+      <div class="law">
+        Reaction time grows with the logarithm of the number of choices.
+        <code>RT = a + b · log₂(n + 1)</code>
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-7 rv">
+        <div class="card">
+          <div class="corner">FIG. 2.1 · CHOICE REACTION</div>
+          <p style="color:var(--paper-dim);font-size:13px;margin-bottom:14px;">
+            Click <b style="color:var(--amber)">START</b>. A target tile will glow — tap it as fast as you can.
+            Try every n. Watch your time grow.
+          </p>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:18px;">
+            <button class="btn amber" id="hick-start">Start trial</button>
+            <span class="label">choices n =</span>
+            <button class="btn hn" data-n="2">2</button>
+            <button class="btn hn" data-n="4">4</button>
+            <button class="btn hn" data-n="8">8</button>
+            <button class="btn hn" data-n="16">16</button>
+            <button class="btn ghost" id="hick-reset">reset</button>
+          </div>
+          <div id="hick-grid" class="stage" style="display:grid;gap:6px;padding:16px;min-height:200px;"></div>
+          <div class="figcap"><span id="hick-status">awaiting input.</span><span><b id="hick-rt">—</b></span></div>
+        </div>
+      </div>
+
+      <div class="col-5 rv">
+        <div class="card" style="height:100%;">
+          <div class="corner">DATA</div>
+          <h3 class="serif" style="font-size:22px;font-weight:400;margin-bottom:14px;">Your reaction curve.</h3>
+          <svg id="hick-chart" viewBox="0 0 360 220" width="100%" height="220">
+            <line x1="40" y1="190" x2="350" y2="190" stroke="#2A2A35"/>
+            <line x1="40" y1="20"  x2="40"  y2="190" stroke="#2A2A35"/>
+            <text x="40" y="210" fill="#A39E92" font-family="JetBrains Mono" font-size="9">2</text>
+            <text x="120" y="210" fill="#A39E92" font-family="JetBrains Mono" font-size="9">4</text>
+            <text x="220" y="210" fill="#A39E92" font-family="JetBrains Mono" font-size="9">8</text>
+            <text x="335" y="210" fill="#A39E92" font-family="JetBrains Mono" font-size="9">16</text>
+            <text x="180" y="14" fill="#A39E92" font-family="JetBrains Mono" font-size="10" text-anchor="middle">RT (ms) vs choices</text>
+            <polyline id="hick-pred" fill="none" stroke="#5DBFA9" stroke-dasharray="3 4" stroke-width="1.2" points=""/>
+            <g id="hick-points"></g>
+          </svg>
+          <p style="color:var(--paper-dim);font-size:12px;margin-top:14px;">
+            Mint dashes = predicted (log₂). Amber dots = you. Long menus aren't free — group, hide,
+            chunk. A 3-deep menu of 4 beats a flat menu of 64.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 GESTALT -->
+<section id="gestalt">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 03 / PRINCIPLE</div>
+        <h2>Gestalt <i>Grouping</i></h2>
+      </div>
+      <div class="law">
+        The mind perceives wholes before parts. Use proximity, similarity, closure, continuity to do
+        layout work for free.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-12 rv">
+        <div class="card">
+          <div class="corner">FIG. 3.x · TOGGLE THE PRINCIPLES</div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;">
+            <label class="switch"><input type="checkbox" id="gp-prox" checked><span class="track"></span>Proximity</label>
+            <label class="switch"><input type="checkbox" id="gp-sim" checked><span class="track"></span>Similarity</label>
+            <label class="switch"><input type="checkbox" id="gp-clo" checked><span class="track"></span>Closure</label>
+            <label class="switch"><input type="checkbox" id="gp-con" checked><span class="track"></span>Continuity</label>
+          </div>
+          <div class="stage" style="padding:24px;">
+            <svg viewBox="0 0 1100 240" width="100%" height="240">
+              <!-- proximity -->
+              <text x="20" y="20" fill="#A39E92" font-family="JetBrains Mono" font-size="10">PROXIMITY</text>
+              <g id="g-prox"></g>
+              <!-- similarity -->
+              <text x="290" y="20" fill="#A39E92" font-family="JetBrains Mono" font-size="10">SIMILARITY</text>
+              <g id="g-sim"></g>
+              <!-- closure -->
+              <text x="560" y="20" fill="#A39E92" font-family="JetBrains Mono" font-size="10">CLOSURE</text>
+              <g id="g-clo"></g>
+              <!-- continuity -->
+              <text x="830" y="20" fill="#A39E92" font-family="JetBrains Mono" font-size="10">CONTINUITY</text>
+              <g id="g-con"></g>
+            </svg>
+          </div>
+          <div class="figcap"><span>fig. 3 — the same dots, four ways of seeing them</span><span><b>4</b> principles · live</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 NORMAN -->
+<section id="norman">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 04 / PRINCIPLE</div>
+        <h2>Norman's <i>Doors</i></h2>
+      </div>
+      <div class="law">
+        Affordance + signifier + mapping + feedback. If a door needs a sign, the door is broken.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-6 rv">
+        <div class="card">
+          <div class="corner">FIG. 4.1 · BAD AFFORDANCE</div>
+          <div class="stage" style="height:280px;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 240 240" width="220" height="220" id="door-bad">
+              <rect x="40" y="20" width="160" height="200" fill="#1B1B24" stroke="#5a2828" stroke-width="2"/>
+              <rect x="60" y="120" width="40" height="8" fill="#E97070"/>
+              <rect x="60" y="105" width="40" height="40" fill="none" stroke="#E97070" stroke-width="1.5"/>
+              <text x="120" y="60" fill="#E97070" font-family="JetBrains Mono" font-size="14" text-anchor="middle">PUSH</text>
+            </svg>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button class="btn" data-door="bad" data-act="push">Push</button>
+            <button class="btn" data-door="bad" data-act="pull">Pull</button>
+          </div>
+          <p id="door-bad-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;height:18px;">handle says “grab me” — sign says “push.” which wins?</p>
+        </div>
+      </div>
+      <div class="col-6 rv">
+        <div class="card">
+          <div class="corner">FIG. 4.2 · GOOD AFFORDANCE</div>
+          <div class="stage" style="height:280px;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 240 240" width="220" height="220" id="door-good">
+              <rect x="40" y="20" width="160" height="200" fill="#1B1B24" stroke="#2c5a4a" stroke-width="2"/>
+              <rect x="60" y="105" width="50" height="40" fill="#5DBFA9" opacity=".25"/>
+              <rect x="60" y="105" width="50" height="40" fill="none" stroke="#5DBFA9" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button class="btn" data-door="good" data-act="push">Push</button>
+            <button class="btn" data-door="good" data-act="pull">Pull</button>
+          </div>
+          <p id="door-good-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;height:18px;">flat plate. nothing to grab. afford only one action.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapping -->
+    <div class="grid12" style="margin-top:24px;">
+      <div class="col-12 rv">
+        <div class="card">
+          <div class="corner">FIG. 4.3 · STOVE MAPPING</div>
+          <h3 class="serif" style="font-size:22px;font-weight:400;margin-bottom:8px;">Which knob lights which burner?</h3>
+          <p style="color:var(--paper-dim);font-size:13px;margin-bottom:16px;">Click a glowing burner. Then click the knob that controls it. Bad mapping forces you to read labels. Good mapping is invisible.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div>
+              <div class="label" style="margin-bottom:8px;">A · linear knobs (bad)</div>
+              <svg id="stove-bad" viewBox="0 0 320 220" width="100%" height="220">
+                <g id="sb-burners"></g>
+                <g id="sb-knobs"></g>
+              </svg>
+              <div class="figcap"><span id="sb-status">—</span><span>guesses: <b id="sb-tries">0</b> · correct: <b id="sb-ok">0</b></span></div>
+            </div>
+            <div>
+              <div class="label" style="margin-bottom:8px;">B · spatial knobs (good)</div>
+              <svg id="stove-good" viewBox="0 0 320 220" width="100%" height="220">
+                <g id="sg-burners"></g>
+                <g id="sg-knobs"></g>
+              </svg>
+              <div class="figcap"><span id="sg-status">—</span><span>guesses: <b id="sg-tries">0</b> · correct: <b id="sg-ok">0</b></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="grid12" style="margin-top:24px;">
+      <div class="col-12 rv">
+        <div class="card">
+          <div class="corner">FIG. 4.4 · FEEDBACK</div>
+          <h3 class="serif" style="font-size:22px;font-weight:400;margin-bottom:8px;">A button that answers, vs a button that doesn't.</h3>
+          <p style="color:var(--paper-dim);font-size:13px;margin-bottom:16px;">Both buttons "work." One leaves you wondering.</p>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <button id="fb-silent" class="btn" style="padding:22px 36px;font-size:14px;">SILENT</button>
+              <div class="label" style="margin-top:8px;">clicks: <span id="fb-silent-c" class="readout">0</span></div>
+            </div>
+            <div style="text-align:center;">
+              <button id="fb-loud" class="btn amber" style="padding:22px 36px;font-size:14px;position:relative;overflow:hidden;">RESPONSIVE</button>
+              <div class="label" style="margin-top:8px;">clicks: <span id="fb-loud-c" class="readout">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 NIELSEN -->
+<section id="nielsen">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 05 / HEURISTICS</div>
+        <h2>Nielsen's <i>Ten</i></h2>
+      </div>
+      <div class="law">
+        Cheap, fast inspection. One reviewer finds ~35% of issues; five reviewers find ~75%.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-12 rv">
+        <div class="h-grid" id="heur-grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 KLM -->
+<section id="klm">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 06 / MODEL</div>
+        <h2>GOMS · <i>KLM</i></h2>
+      </div>
+      <div class="law">
+        Predict expert task time before you build. Sum the keystrokes — the cheapest usability test you'll ever run.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-12 rv">
+        <div class="card">
+          <div class="corner">FIG. 6 · KLM LABORATORY</div>
+          <h3 class="serif" style="font-size:24px;font-weight:400;margin-bottom:6px;">Build a task. Watch the seconds add up.</h3>
+          <p style="color:var(--paper-dim);font-size:13px;margin-bottom:22px;max-width:780px;">
+            Every interaction with software decomposes into five primitive operators. Tap one below to
+            add it — or run a guided scenario on the right to see a real task play out, step-explanation
+            and tokens in view at the same time.
+          </p>
+
+          <!-- Operators: full width -->
+          <div class="klm-ops">
+            <button class="klm-op" data-op="K">
+              <span class="lt">K</span>
+              <span class="nm">Keystroke</span>
+              <span class="cost">+0.20s</span>
+              <span class="ex">letter, space, enter, click</span>
+            </button>
+            <button class="klm-op" data-op="P">
+              <span class="lt">P</span>
+              <span class="nm">Point</span>
+              <span class="cost">+1.10s</span>
+              <span class="ex">move mouse to a target</span>
+            </button>
+            <button class="klm-op" data-op="H">
+              <span class="lt">H</span>
+              <span class="nm">Home hand</span>
+              <span class="cost">+0.40s</span>
+              <span class="ex">switch keyboard ↔ mouse</span>
+            </button>
+            <button class="klm-op" data-op="M">
+              <span class="lt">M</span>
+              <span class="nm">Mental act</span>
+              <span class="cost">+1.35s</span>
+              <span class="ex">pause to think / decide</span>
+            </button>
+            <button class="klm-op" data-op="R">
+              <span class="lt">R</span>
+              <span class="nm">Response</span>
+              <span class="cost">+0.50s</span>
+              <span class="ex">wait for the system</span>
+            </button>
+          </div>
+
+          <!-- Split layout: timeline left, explanation + scenarios right -->
+          <div class="klm-split">
+            <div class="klm-col-main">
+              <div class="klm-side-head">
+                <span>Timeline · operators in order</span>
+                <span class="hint">tap operators or run a scenario →</span>
+              </div>
+              <div class="klm-tl" id="klm-tl"><div class="empty">— timeline is empty. tap any operator above, or pick a scenario on the right —</div></div>
+
+              <div class="klm-ctrl">
+                <button class="btn" id="klm-undo">↶ Undo last</button>
+                <button class="btn ghost" id="klm-clear">Clear all</button>
+                <div class="klm-total-big">
+                  <span class="lab">total</span>
+                  <span class="v" id="klm-total">0.00s</span>
+                </div>
+              </div>
+
+              <div class="klm-bar-wrap" id="klm-bar-wrap">
+                <div class="tit">
+                  <span>Time breakdown · by operator</span>
+                  <span class="k" id="klm-bar-total">0.00s</span>
+                </div>
+                <div class="klm-bar" id="klm-bar"></div>
+                <div class="klm-legend" id="klm-legend"></div>
+              </div>
+            </div>
+
+            <div class="klm-col-side">
+              <div class="klm-side-head">
+                <span>Live · current step</span>
+                <span class="hint">what's happening &amp; why</span>
+              </div>
+              <div class="scen-explain" id="scen-exp">
+                <div class="empty">— pick a scenario below. each step will appear here while the token lands in the timeline on the left. —</div>
+              </div>
+
+              <div class="klm-side-head" style="margin-top:10px;">
+                <span>Guided scenarios</span>
+                <span class="hint">real, everyday tasks</span>
+              </div>
+              <div class="scen-row" id="scen-row"></div>
+            </div>
+          </div>
+
+          <p style="color:var(--paper-dim);font-size:12px;margin-top:28px;border-top:1px solid var(--rule);padding-top:14px;">
+            <b style="color:var(--amber)">The point of KLM:</b> you can predict expert task time before you build a single
+            screen. If your design needs five M-operators just to get to the user's goal, the design is asking too much.
+            Strip mental steps with sensible defaults, recognition over recall, and consistent placement.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 COLOR -->
+<section id="color">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 07 / TOOL</div>
+        <h2>Color &amp; <i>Contrast</i></h2>
+      </div>
+      <div class="law">
+        WCAG demands 4.5:1 for body text, 3:1 for large. Below that, ~10% of your readers cannot see your interface.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-7 rv">
+        <div class="card">
+          <div class="corner">FIG. 7.1 · CONTRAST CHECKER</div>
+          <div id="cc-preview" style="padding:42px;border-radius:4px;border:1px dashed var(--rule);">
+            <div style="font-family:Fraunces;font-weight:500;font-size:36px;line-height:1.1;" id="cc-large">Large headline text.</div>
+            <div style="font-family:'JetBrains Mono';font-size:14px;margin-top:14px;" id="cc-body">Body copy you actually have to read for minutes at a time. If contrast is poor, this hurts.</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-5 rv">
+        <div class="card" style="height:100%;">
+          <div class="corner">CONTROLS</div>
+          <div style="display:flex;gap:18px;align-items:center;margin-bottom:14px;">
+            <div><div class="label">foreground</div><input type="color" id="cc-fg" value="#E8E6DD"></div>
+            <div><div class="label">background</div><input type="color" id="cc-bg" value="#13131A"></div>
+          </div>
+          <div style="margin-top:18px;border-top:1px solid var(--rule);padding-top:18px;">
+            <div class="readout" style="font-size:48px;line-height:1;" id="cc-ratio">—</div>
+            <div class="label" style="margin-top:6px;">contrast ratio</div>
+            <div style="margin-top:18px;display:flex;flex-wrap:wrap;gap:6px;" id="cc-badges"></div>
+          </div>
+          <p style="color:var(--paper-dim);font-size:12px;margin-top:18px;">
+            Computed from WCAG 2.x relative luminance. Aim for AAA on body whenever the design allows.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 A11Y -->
+<section id="a11y">
+  <div class="wrap">
+    <div class="sec-h rv">
+      <div>
+        <div class="num">§ 08 / SIMULATION</div>
+        <h2>Accessibility <i>Sim</i></h2>
+      </div>
+      <div class="law">
+        The fastest way to design for everyone is to take away your senses one at a time and try again.
+      </div>
+    </div>
+
+    <div class="grid12">
+      <div class="col-7 rv">
+        <div class="card">
+          <div class="corner">FIG. 8.1 · INTERFACE UNDER TEST</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
+            <label class="switch"><input type="checkbox" id="ax-sr"><span class="track"></span>screen reader narration</label>
+            <label class="switch"><input type="checkbox" id="ax-hc"><span class="track"></span>high contrast</label>
+            <label class="switch"><input type="checkbox" id="ax-rm"><span class="track"></span>reduce motion</label>
+            <label class="switch"><input type="checkbox" id="ax-cb"><span class="track"></span>colour-blind sim</label>
+          </div>
+          <div class="a11y-frame" id="ax-frame">
+            <h4 style="font-family:Fraunces;font-size:22px;font-weight:400;margin-bottom:14px;">Sign up for the lab.</h4>
+            <div class="form-row">
+              <label for="axn" class="label">name</label>
+              <input id="axn" type="text" data-aria="text field, name, required" placeholder="your name"/>
+            </div>
+            <div class="form-row">
+              <label for="axe" class="label">email</label>
+              <input id="axe" type="text" data-aria="text field, email" placeholder="you@nptel.in"/>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn amber" data-aria="button, submit signup form">Submit</button>
+              <a href="#" class="btn" data-aria="link, terms and conditions">Terms</a>
+              <span style="display:inline-flex;align-items:center;gap:8px;color:var(--mint);font-size:12px;" data-aria="status, all systems nominal"><span style="width:8px;height:8px;background:var(--mint);border-radius:50%;display:inline-block;"></span>nominal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-5 rv">
+        <div class="card" style="height:100%;">
+          <div class="corner">SCREEN READER OUTPUT</div>
+          <div class="sr-log" id="sr-log">› narration disabled. enable “screen reader narration” and tab through the form.</div>
+          <p style="color:var(--paper-dim);font-size:12px;margin-top:14px;">
+            What a real user hears. If it sounds like nonsense to you, fix the labels — not the
+            screen reader.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="grid12">
+      <div class="col-6">
+        <h3 class="serif" style="font-size:42px;font-weight:400;line-height:1;">
+          One site.<br/><i style="color:var(--amber)">Ten instruments.</i>
+        </h3>
+        <p style="color:var(--paper-dim);margin-top:18px;max-width:440px;font-size:13px;">
+          Built as the practical companion to <b style="color:var(--paper)">HCI 06.103.115</b>. Every demo
+          here was hand-coded — no frameworks, no libraries, ~28KB of vanilla JS. View source. Read it.
+          Break it. That's the whole point.
+        </p>
+      </div>
+      <div class="col-6">
+        <div class="label">Citations</div>
+        <div class="cite">
+          <div><b>Norman, D. (1988)</b>The Design of Everyday Things.</div>
+          <div><b>Nielsen, J. (1994)</b>10 Usability Heuristics.</div>
+          <div><b>Fitts, P. (1954)</b>Information capacity of the motor system.</div>
+          <div><b>Hick, W. E. (1952)</b>On the rate of gain of information.</div>
+          <div><b>Card, Moran, Newell (1983)</b>The Psychology of HCI · KLM.</div>
+          <div><b>WCAG 2.2 (2023)</b>Web Content Accessibility Guidelines.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid var(--rule);">
+      <div>FIELD&nbsp;LAB · v1.0 · 2026</div>
+      <div>made for an O+ · keep the curiosity</div>
+    </div>
+  </div>
+</footer>
+
+<!-- HEURISTIC MODAL -->
+<div class="h-modal" id="heur-modal">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="num label" id="hm-num"></div>
+        <h3 class="serif" style="font-size:32px;font-weight:400;margin-top:6px;" id="hm-title"></h3>
+      </div>
+      <button class="btn ghost" id="hm-close">close ✕</button>
+    </div>
+    <p style="color:var(--paper-dim);margin-top:8px;" id="hm-desc"></p>
+    <div class="ba" id="hm-ba"></div>
+  </div>
+</div>
+
+<script>
+/* ===== reveal on scroll ===== */
+const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ===== 1. FITTS ===== */
+(()=>{
+  const a = (1/8)*1000, b = (1/8)*1000; // ms; standard ~ a=100, b=125
+  const A = 100, B = 150;
+  const svg = document.getElementById('fitts-svg');
+  const cA = document.getElementById('fitts-a');
+  const cB = document.getElementById('fitts-b');
+  const line = document.getElementById('fitts-line');
+  const dEl = document.getElementById('fittsD'), wEl = document.getElementById('fittsW');
+  const dV = document.getElementById('fittsD-v'), wV = document.getElementById('fittsW-v');
+  const idEl = document.getElementById('fitts-id'), pred = document.getElementById('fitts-pred');
+  const youEl = document.getElementById('fitts-you'), instr = document.getElementById('fitts-instr');
+  const result = document.getElementById('fitts-result'), trial = document.getElementById('fitts-trial');
+  const actual = document.getElementById('fitts-actual');
+
+  let trials = 0, tStart = null, expecting = 'A';
+
+  function update(){
+    const D = +dEl.value, W = +wEl.value;
+    dV.textContent = D + ' px'; wV.textContent = W + ' px';
+    cB.setAttribute('cx', 100 + D); cB.setAttribute('r', W/2);
+    line.setAttribute('x2', 100 + D);
+    const ID = Math.log2(D/W + 1);
+    const MT = (A + B*ID);
+    idEl.textContent = ID.toFixed(2) + ' bits';
+    pred.textContent = MT.toFixed(0) + ' ms';
+  }
+  dEl.addEventListener('input',update); wEl.addEventListener('input',update);
+  update();
+
+  cA.style.cursor='pointer'; cB.style.cursor='pointer';
+  cA.addEventListener('click',()=>{
+    if(expecting!=='A') return;
+    tStart = performance.now(); expecting='B'; instr.textContent='now click the mint target →';
+    result.textContent='';
+  });
+  cB.addEventListener('click',()=>{
+    if(expecting!=='B') return;
+    const dt = performance.now() - tStart;
+    trials++; trial.textContent = 'trial ' + trials;
+    youEl.textContent = dt.toFixed(0) + ' ms';
+    actual.textContent = dt.toFixed(0) + ' ms';
+    result.textContent = 'measured ' + dt.toFixed(0) + ' ms · predicted ' + pred.textContent;
+    expecting='A'; instr.textContent='click amber to start a new trial';
+  });
+})();
+
+/* ===== 2. HICK ===== */
+(()=>{
+  const grid = document.getElementById('hick-grid');
+  const startBtn = document.getElementById('hick-start');
+  const status = document.getElementById('hick-status');
+  const rtEl = document.getElementById('hick-rt');
+  const chartPts = document.getElementById('hick-points');
+  const chartPred = document.getElementById('hick-pred');
+  let n = 4, target=null, t0=null, samples = {2:[],4:[],8:[],16:[]};
+
+  function render(){
+    grid.innerHTML='';
+    const cols = Math.ceil(Math.sqrt(n));
+    grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+    for(let i=0;i<n;i++){
+      const t = document.createElement('button');
+      t.className='btn';
+      t.style.height = (200/Math.ceil(n/cols))+'px';
+      t.style.minHeight='44px'; t.style.fontSize='14px';
+      t.textContent = i+1;
+      t.addEventListener('click',()=>{
+        if(target===null) return;
+        const dt = performance.now()-t0;
+        if(i===target){
+          samples[n].push(dt);
+          status.textContent = `hit · n=${n} · ${dt.toFixed(0)} ms`;
+          rtEl.textContent = dt.toFixed(0)+' ms';
+        }else{
+          status.textContent = `miss · expected ${target+1}`;
+          rtEl.textContent = '— ms';
+        }
+        target=null; clear();
+        plot();
+      });
+      grid.appendChild(t);
+    }
+  }
+  function clear(){ [...grid.children].forEach(c=>c.style.background='transparent'); }
+  function plot(){
+    const pts = [];
+    [2,4,8,16].forEach((nn,idx)=>{
+      const xs = [40,120,220,335][idx];
+      // prediction (a=180, b=180)
+      const yPred = 190 - (180 + 180*Math.log2(nn+1)) / 8;
+      pts.push([xs, yPred]);
+      const arr = samples[nn];
+      if(arr.length){
+        const avg = arr.reduce((s,v)=>s+v,0)/arr.length;
+        const y = Math.max(20, 190 - avg/8);
+        const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        dot.setAttribute('cx',xs); dot.setAttribute('cy',y);
+        dot.setAttribute('r',4); dot.setAttribute('fill','#E8B547');
+        chartPts.appendChild(dot);
+      }
+    });
+    chartPred.setAttribute('points', pts.map(p=>p.join(',')).join(' '));
+  }
+  function reset(){ samples={2:[],4:[],8:[],16:[]}; chartPts.innerHTML=''; plot(); status.textContent='reset.'; rtEl.textContent='—'; }
+  startBtn.addEventListener('click',()=>{
+    clear();
+    target = Math.floor(Math.random()*n);
+    setTimeout(()=>{
+      grid.children[target].style.background='var(--amber)';
+      grid.children[target].style.color='var(--ink)';
+      grid.children[target].style.borderColor='var(--amber)';
+      t0 = performance.now();
+      status.textContent='go!';
+    }, 400 + Math.random()*900);
+    status.textContent = 'wait for the glow…';
+  });
+  document.querySelectorAll('.hn').forEach(b=>b.addEventListener('click',()=>{
+    n = +b.dataset.n; render();
+    document.querySelectorAll('.hn').forEach(x=>x.classList.remove('amber'));
+    b.classList.add('amber');
+  }));
+  document.getElementById('hick-reset').addEventListener('click',reset);
+  render(); plot();
+})();
+
+/* ===== 3. GESTALT ===== */
+(()=>{
+  const w = 220, top = 40;
+  function dotsProx(g, grouped){
+    g.innerHTML='';
+    const cols = 6, rows = 5;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const gx = grouped ? (c<3 ? c*14 : c*14+30) : c*22;
+      const c1 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c1.setAttribute('cx', 30 + gx);
+      c1.setAttribute('cy', top + r*30);
+      c1.setAttribute('r',5); c1.setAttribute('fill','#E8E6DD');
+      g.appendChild(c1);
+    }
+  }
+  function dotsSim(g, grouped){
+    g.innerHTML='';
+    const cols=6, rows=5;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const c1 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c1.setAttribute('cx', 300 + c*22); c1.setAttribute('cy', top + r*30); c1.setAttribute('r',5);
+      const isAlt = grouped ? (c%2===0) : false;
+      c1.setAttribute('fill', isAlt ? '#E8B547' : '#E8E6DD');
+      g.appendChild(c1);
+    }
+  }
+  function dotsClo(g, grouped){
+    g.innerHTML='';
+    const cx=640, cy=110, R=64;
+    const N = grouped ? 16 : 64;
+    for(let i=0;i<N;i++){
+      const a = (i/64)*Math.PI*2 - Math.PI/2;
+      // skip arc to imply incomplete shape unless grouped (closure on)
+      if(grouped && (i>=16 && i<32 || i>=44 && i<56)) continue;
+      const c1 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c1.setAttribute('cx', cx + Math.cos(a)*R);
+      c1.setAttribute('cy', cy + Math.sin(a)*R);
+      c1.setAttribute('r', 3.4); c1.setAttribute('fill','#5DBFA9');
+      g.appendChild(c1);
+    }
+  }
+  function dotsCon(g, grouped){
+    g.innerHTML='';
+    const x0 = 870;
+    for(let i=0;i<24;i++){
+      const t = i/23;
+      const x = x0 + t*180;
+      const y = grouped ? top + 80 + Math.sin(t*Math.PI*2)*40 : top + Math.random()*150;
+      const c1 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c1.setAttribute('cx',x); c1.setAttribute('cy',y); c1.setAttribute('r',4); c1.setAttribute('fill','#B68FE0');
+      g.appendChild(c1);
+    }
+  }
+  const gP = document.getElementById('g-prox'), gS = document.getElementById('g-sim'), gC = document.getElementById('g-clo'), gN = document.getElementById('g-con');
+  function update(){
+    dotsProx(gP, document.getElementById('gp-prox').checked);
+    dotsSim(gS, document.getElementById('gp-sim').checked);
+    dotsClo(gC, document.getElementById('gp-clo').checked);
+    dotsCon(gN, document.getElementById('gp-con').checked);
+  }
+  ['gp-prox','gp-sim','gp-clo','gp-con'].forEach(id=>document.getElementById(id).addEventListener('change',update));
+  update();
+})();
+
+/* ===== 4. NORMAN doors ===== */
+(()=>{
+  function bind(which, correct, msg){
+    document.querySelectorAll(`[data-door="${which}"]`).forEach(b=>{
+      b.addEventListener('click',()=>{
+        const svg = document.getElementById('door-'+which);
+        if(b.dataset.act===correct){
+          svg.animate([{transform:'rotateY(0)'},{transform:'rotateY(-30deg)'}],{duration:600,fill:'forwards',easing:'cubic-bezier(.2,.7,.3,1)'});
+          msg.textContent = `correct — door is ${correct} type. you used the affordance, not the sign.`;
+          msg.style.color = 'var(--mint)';
+        }else{
+          svg.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:300});
+          msg.textContent = `wrong — but you trusted the handle. that's the bug.`;
+          msg.style.color = 'var(--rose)';
+        }
+      });
+    });
+  }
+  bind('bad','pull', document.getElementById('door-bad-msg'));
+  bind('good','push', document.getElementById('door-good-msg'));
+})();
+
+/* ===== 4b. STOVE mapping ===== */
+(()=>{
+  // burners: 2x2 at top.  knobs: separate region at bottom.
+  const burnerPos = [[90,40],[230,40],[90,96],[230,96]];
+
+  function buildStove(prefix, knobFn){
+    const sb = document.getElementById(prefix+'-burners');
+    const sk = document.getElementById(prefix+'-knobs');
+    const tEl = document.getElementById(prefix+'-tries');
+    const oEl = document.getElementById(prefix+'-ok');
+    const stEl = document.getElementById(prefix+'-status');
+    let chosen=null, tries=0, ok=0;
+    sb.innerHTML=''; sk.innerHTML='';
+
+    // section dividers / labels
+    const lab1 = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab1.setAttribute('x',16); lab1.setAttribute('y',18);
+    lab1.setAttribute('fill','#A39E92'); lab1.setAttribute('font-family','JetBrains Mono');
+    lab1.setAttribute('font-size','9'); lab1.setAttribute('letter-spacing','2');
+    lab1.textContent='BURNERS';
+    sb.appendChild(lab1);
+
+    const sep = document.createElementNS('http://www.w3.org/2000/svg','line');
+    sep.setAttribute('x1',16); sep.setAttribute('x2',304);
+    sep.setAttribute('y1',150); sep.setAttribute('y2',150);
+    sep.setAttribute('stroke','#2A2A35'); sep.setAttribute('stroke-dasharray','3 4');
+    sb.appendChild(sep);
+
+    const lab2 = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lab2.setAttribute('x',16); lab2.setAttribute('y',168);
+    lab2.setAttribute('fill','#A39E92'); lab2.setAttribute('font-family','JetBrains Mono');
+    lab2.setAttribute('font-size','9'); lab2.setAttribute('letter-spacing','2');
+    lab2.textContent='KNOBS';
+    sb.appendChild(lab2);
+
+    // burners (drawn in sb group so they sit behind knobs visually but separate Y region)
+    burnerPos.forEach((p,i)=>{
+      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('cx',p[0]); ring.setAttribute('cy',p[1]); ring.setAttribute('r',26);
+      ring.setAttribute('fill','#1B1B24'); ring.setAttribute('stroke','#2A2A35'); ring.setAttribute('stroke-width','1');
+      ring.style.cursor='pointer';
+      const inner = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      inner.setAttribute('cx',p[0]); inner.setAttribute('cy',p[1]); inner.setAttribute('r',16);
+      inner.setAttribute('fill','none'); inner.setAttribute('stroke','#3A3A48'); inner.setAttribute('stroke-width','1');
+      inner.style.pointerEvents='none';
+      const lab = document.createElementNS('http://www.w3.org/2000/svg','text');
+      lab.setAttribute('x',p[0]); lab.setAttribute('y',p[1]+4);
+      lab.setAttribute('fill','#A39E92'); lab.setAttribute('font-family','JetBrains Mono');
+      lab.setAttribute('font-size','10'); lab.setAttribute('text-anchor','middle');
+      lab.style.pointerEvents='none';
+      lab.textContent = String.fromCharCode(65+i); // A B C D
+      ring.addEventListener('click',()=>{
+        chosen = i;
+        [...sb.querySelectorAll('circle')].forEach(x=>{
+          if(x.getAttribute('r')==='26'){ x.setAttribute('stroke','#2A2A35'); x.setAttribute('stroke-width','1'); x.setAttribute('fill','#1B1B24'); }
+        });
+        ring.setAttribute('stroke','#E8B547'); ring.setAttribute('stroke-width','2');
+        ring.setAttribute('fill','#2a2418');
+        stEl.textContent = `burner ${String.fromCharCode(65+i)} selected. now tap its knob.`;
+      });
+      sb.appendChild(ring); sb.appendChild(inner); sb.appendChild(lab);
+    });
+
+    // knobs
+    burnerPos.forEach((_,i)=>{
+      const k = knobFn(i);
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',k[0]); c.setAttribute('cy',k[1]); c.setAttribute('r',14);
+      c.setAttribute('fill','#13131A'); c.setAttribute('stroke','#5DBFA9');
+      c.style.cursor='pointer';
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',k[0]); t.setAttribute('y',k[1]+4);
+      t.setAttribute('fill','#5DBFA9'); t.setAttribute('font-family','JetBrains Mono');
+      t.setAttribute('font-size','11'); t.setAttribute('text-anchor','middle');
+      t.style.pointerEvents='none';
+      t.textContent = i+1;
+      c.addEventListener('click',()=>{
+        if(chosen===null){ stEl.textContent='select a burner first.'; return; }
+        tries++; tEl.textContent=tries;
+        if(i===chosen){
+          ok++; oEl.textContent=ok;
+          stEl.textContent='✓ correct mapping.';
+          c.setAttribute('fill','#5DBFA9'); t.setAttribute('fill','#0B0B0E');
+        } else {
+          stEl.textContent='✗ wrong knob — that one controls '+String.fromCharCode(65+i)+'.';
+          c.setAttribute('fill','#E97070'); c.setAttribute('stroke','#E97070'); t.setAttribute('fill','#0B0B0E');
+        }
+        setTimeout(()=>{ c.setAttribute('fill','#13131A'); c.setAttribute('stroke','#5DBFA9'); t.setAttribute('fill','#5DBFA9'); },600);
+        chosen=null;
+        [...sb.querySelectorAll('circle')].forEach(x=>{
+          if(x.getAttribute('r')==='26'){ x.setAttribute('stroke','#2A2A35'); x.setAttribute('stroke-width','1'); x.setAttribute('fill','#1B1B24'); }
+        });
+      });
+      sk.appendChild(c); sk.appendChild(t);
+    });
+  }
+
+  // BAD: burners 2x2, knobs in a single row → no spatial relationship
+  buildStove('sb', i => [[55,195],[125,195],[195,195],[265,195]][i]);
+  // GOOD: knobs in same 2x2 layout as burners → position itself encodes mapping
+  buildStove('sg', i => [[90,178],[230,178],[90,206],[230,206]][i]);
+})();
+
+/* ===== 4c. FEEDBACK buttons ===== */
+(()=>{
+  let s=0, l=0;
+  document.getElementById('fb-silent').addEventListener('click',()=>{
+    s++; document.getElementById('fb-silent-c').textContent=s;
+  });
+  const loud = document.getElementById('fb-loud');
+  loud.addEventListener('click',(e)=>{
+    l++; document.getElementById('fb-loud-c').textContent=l;
+    const r = document.createElement('span');
+    const rect = loud.getBoundingClientRect();
+    r.style.cssText = `position:absolute;left:${e.clientX-rect.left}px;top:${e.clientY-rect.top}px;width:8px;height:8px;border-radius:50%;background:rgba(11,11,14,.4);transform:translate(-50%,-50%);pointer-events:none;`;
+    loud.appendChild(r);
+    r.animate([{width:'8px',height:'8px',opacity:1},{width:'260px',height:'260px',opacity:0}],{duration:600,easing:'ease-out'}).onfinish=()=>r.remove();
+  });
+})();
+
+/* ===== 5. NIELSEN ===== */
+(()=>{
+  const heur = [
+    {n:'01',t:'Visibility of system status',d:'Always inform users about what is going on, through appropriate, timely feedback.',
+     bad:'a "save" button you click and… nothing visibly happens for 4 seconds.',
+     good:'an inline spinner that morphs into a green check, with the saved time printed below.',
+     bv:`<div class="mlabel">DRAFT · settings</div><div class="mrow"><span class="mbtn pri">SAVE</span></div><div class="stuck" style="margin-top:auto">…did anything happen?</div>`,
+     gv:`<div class="mlabel">DRAFT · settings</div><div class="mrow"><span class="mbtn pri">SAVE</span><span class="pulse"></span><span style="font-size:10px;color:#8B7E6A;">saving…</span></div><div class="mok" style="margin-top:auto"><span class="mdot"></span>Saved · 2 seconds ago</div>`
+    },
+    {n:'02',t:'Match between system & real world',d:'Speak the user\'s language; follow real-world conventions.',
+     bad:'an error message reading <code>ERR_RFC2822_LOCAL_PART_INVALID</code>.',
+     good:'"that email address looks unusual — try removing the period before the @."',
+     bv:`<div class="mlabel">SIGN UP</div><input value="meera.@gmail.com" class="mfield err" readonly /><div class="merr" style="margin-top:6px;font-family:'JetBrains Mono';">ERR_RFC2822_LOCAL_PART_INVALID<br/>at line 142, validator.js</div>`,
+     gv:`<div class="mlabel">SIGN UP</div><input value="meera.@gmail.com" class="mfield err" readonly /><div class="merr soft" style="margin-top:6px;">That email looks unusual — try removing the period right before the <b>@</b>.</div>`
+    },
+    {n:'03',t:'User control & freedom',d:'Provide a clearly marked emergency exit. Support undo and redo.',
+     bad:'a 5-step wizard with no back button. one wrong choice = restart.',
+     good:'visible breadcrumbs at every step + cmd-Z undoes the last destructive action.',
+     bv:`<div class="progress"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span> &nbsp;STEP 3 / 5</div><div style="margin-top:10px;font-family:Fraunces;font-style:italic;font-size:18px;color:#1A1410;">Choose your plan.</div><div class="mrow" style="margin-top:auto"><span class="mbtn pri">CONTINUE →</span></div><div class="stuck" style="margin-top:6px;">no way back. one wrong tap = restart.</div>`,
+     gv:`<div class="mcrumb">Account › Profile › <b>Plan</b></div><div style="margin-top:10px;font-family:Fraunces;font-style:italic;font-size:18px;color:#1A1410;">Choose your plan.</div><div class="mrow" style="margin-top:auto"><span class="mbtn gho">← BACK</span><span class="mbtn pri">CONTINUE →</span></div><div style="font-size:10px;color:#8B7E6A;">⌘Z to undo last change · session autosaved</div>`
+    },
+    {n:'04',t:'Consistency & standards',d:'Same words, same actions, same places. Follow platform conventions.',
+     bad:'"Submit" on one page, "Send" on the next, "Confirm" on the third. all the same action.',
+     good:'one verb — "Save" — used everywhere, in the same position, with the same colour.',
+     bv:`<div class="mlabel">three pages, one action</div><div class="mrow"><span class="mbtn" style="background:#0F4C75;color:#fff">SUBMIT</span></div><div class="mrow"><span class="mbtn" style="background:#7A2929;color:#fff">SEND</span></div><div class="mrow"><span class="mbtn" style="background:#3A8A6E;color:#fff">CONFIRM</span></div><div class="stuck">three verbs, three colours, one job.</div>`,
+     gv:`<div class="mlabel">three pages, one action</div><div class="mrow"><span class="mbtn pri">SAVE</span></div><div class="mrow"><span class="mbtn pri">SAVE</span></div><div class="mrow"><span class="mbtn pri">SAVE</span></div><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">same verb, same place, same colour. zero learning cost.</div>`
+    },
+    {n:'05',t:'Error prevention',d:'Eliminate error-prone conditions, or surface a confirmation.',
+     bad:'a button labelled <b>Delete forever</b> right next to <b>Save</b>. no confirm.',
+     good:'destructive actions live in a separate menu, require typing the project name.',
+     bv:`<div class="mlabel">PROJECT · final-thesis</div><div style="font-family:Fraunces;font-style:italic;font-size:16px">Final thesis draft</div><div class="mrow" style="margin-top:auto"><span class="mbtn pri">SAVE</span><span class="mbtn dng">DELETE FOREVER</span></div><div class="stuck">slip of the thumb = a year's work, gone.</div>`,
+     gv:`<div class="mlabel">CONFIRM DELETION</div><div style="font-size:11px;line-height:1.5;color:#1A1410">This will permanently delete <b>final-thesis</b>. Type the project name to continue:</div><input value="" class="mfield" placeholder="final-thesis" readonly/><div class="mrow" style="margin-top:auto"><span class="mbtn gho">CANCEL</span><span class="mbtn dng" style="opacity:.4">DELETE</span></div>`
+    },
+    {n:'06',t:'Recognition over recall',d:'Make objects, actions, and options visible. Don\'t make users remember.',
+     bad:'a command-line search where you must remember each filter\'s flag name.',
+     good:'autocomplete chips for every filter you can apply, with descriptions on hover.',
+     bv:`<div class="mlabel">FILTER ISSUES</div><div class="term"><span class="pr">$</span> filter --status=open --priority=high \\<br/>&nbsp;&nbsp;--assignee=meera --label=ux --since=7d</div><div class="stuck">remember every flag name, exactly.</div>`,
+     gv:`<div class="mlabel">FILTER ISSUES</div><div class="mrow"><span class="mchip act">status: open ✕</span><span class="mchip act">priority: high ✕</span><span class="mchip act">assignee: meera ✕</span></div><div class="mrow" style="margin-top:4px;"><span class="mchip">+ label</span><span class="mchip">+ date</span><span class="mchip">+ milestone</span></div><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">tap to add. nothing to remember.</div>`
+    },
+    {n:'07',t:'Flexibility & efficiency of use',d:'Accelerators — unseen by novices — speed up expert use.',
+     bad:'every action requires four clicks through nested menus. no shortcuts.',
+     good:'<kbd>cmd-K</kbd> opens a fuzzy command palette spanning every action in the app.',
+     bv:`<div class="mlabel">FIND IN FILES</div><div style="font-size:10px;color:#1A1410;line-height:1.7">File ▸<br/>&nbsp;&nbsp;Edit ▸<br/>&nbsp;&nbsp;&nbsp;&nbsp;Find ▸<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Find in Files…</b></div><div class="stuck">four hops. every time.</div>`,
+     gv:`<div class="mlabel">⌘K · COMMAND PALETTE</div><div class="palette"><div class="q">> find in fil_</div><div class="opt sel">↳ Find in Files…  &nbsp; ⇧⌘F</div><div class="opt">↳ Find in Folder…</div><div class="opt">↳ Replace in Files…</div></div><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">novices use the menu. experts type two letters.</div>`
+    },
+    {n:'08',t:'Aesthetic & minimalist design',d:'Every extra unit of information competes with the relevant ones.',
+     bad:'a dashboard with 38 metrics on one screen. nothing draws the eye.',
+     good:'three primary metrics, large; the rest behind a "more" disclosure.',
+     bv:`<div class="mlabel">DASHBOARD</div><div class="stove-grid">${Array.from({length:18},(_,i)=>`<div class="c"><div style="font-weight:700">${(Math.random()*100|0)}%</div><div style="font-size:7px;color:#8B7E6A">M${i+1}</div></div>`).join('')}</div><div class="stuck">where do i look?</div>`,
+     gv:`<div class="mlabel">DASHBOARD</div><div class="mrow" style="gap:8px"><div class="mtile lg"><div class="v">81%</div><div class="k">Conversion</div></div><div class="mtile lg"><div class="v">₹1.2L</div><div class="k">Revenue / wk</div></div><div class="mtile lg"><div class="v">4.6</div><div class="k">SUS score</div></div></div><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">+ 35 secondary metrics &nbsp;▾</div>`
+    },
+    {n:'09',t:'Help users recognise & recover from errors',d:'Plain language, identify the problem, suggest a solution.',
+     bad:'"Form invalid." (no indication which field is wrong.)',
+     good:'each invalid field is highlighted, with a sentence explaining how to fix it.',
+     bv:`<div class="merr">⚠ Form invalid. Please correct errors and resubmit.</div><div class="mlabel" style="margin-top:8px">PASSWORD</div><input class="mfield" value="hello" readonly/><div class="mlabel">CONFIRM</div><input class="mfield" value="hello" readonly/><div class="stuck">which field? which rule?</div>`,
+     gv:`<div class="mlabel">PASSWORD</div><input class="mfield err" value="hello" readonly/><div style="font-size:10px;color:#B23A3A;margin-top:-4px;">↳ must be at least 8 characters. you have 5.</div><div class="mlabel" style="margin-top:6px">CONFIRM</div><input class="mfield" value="hello" readonly/><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">errors are local · plain · actionable.</div>`
+    },
+    {n:'10',t:'Help & documentation',d:'Even if better off without docs — provide them, and make them searchable.',
+     bad:'a "?" icon links to a 200-page PDF.',
+     good:'context-aware tooltips, inline how-tos, and a search bar that returns examples.',
+     bv:`<div class="mlabel">NEED HELP?</div><div style="font-size:10px;color:#1A1410">Click <b>?</b> for the user manual.</div><div class="pdf"><div class="ic">PDF</div><div><div style="font-size:11px;font-weight:700">UserManual_v4.7.pdf</div><div style="font-size:9px;color:#8B7E6A">214 pages · 18.4 MB</div></div></div><div class="stuck">good luck finding section 6.3.2.</div>`,
+     gv:`<div class="mlabel">IFSC CODE</div><input class="mfield" value="" placeholder="e.g. SBIN0001234" readonly/><div class="tip" style="margin-top:8px"><b>What's an IFSC?</b> An 11-character bank-branch code. Find it on your cheque, top-right.</div><div style="margin-top:auto;font-size:10px;color:#8B7E6A;">help arrives where the question is.</div>`
+    },
+  ];
+  const grid = document.getElementById('heur-grid');
+  heur.forEach(h=>{
+    const card = document.createElement('div');
+    card.className='h-card';
+    card.innerHTML = `<div class="n">H ${h.n}</div><h4>${h.t}</h4><p>${h.d}</p>`;
+    card.addEventListener('click',()=>{
+      document.getElementById('hm-num').textContent = 'HEURISTIC ' + h.n;
+      document.getElementById('hm-title').textContent = h.t;
+      document.getElementById('hm-desc').textContent = h.d;
+      document.getElementById('hm-ba').innerHTML = `
+        <div class="b bad"><div class="tag">VIOLATION</div><div class="mock" style="margin-top:10px;">${h.bv}</div><p style="margin-top:10px;font-size:12px;color:var(--paper-dim);">${h.bad}</p></div>
+        <div class="b good"><div class="tag">RESPECTED</div><div class="mock" style="margin-top:10px;">${h.gv}</div><p style="margin-top:10px;font-size:12px;color:var(--paper-dim);">${h.good}</p></div>`;
+      document.getElementById('heur-modal').classList.add('open');
+    });
+    grid.appendChild(card);
+  });
+  document.getElementById('hm-close').addEventListener('click',()=>document.getElementById('heur-modal').classList.remove('open'));
+  document.getElementById('heur-modal').addEventListener('click',e=>{if(e.target.id==='heur-modal')e.target.classList.remove('open');});
+})();
+
+/* ===== 6. KLM ===== */
+(()=>{
+  const cost = {K:0.20,P:1.10,H:0.40,M:1.35,R:0.50};
+  const opOrder = ['M','P','K','H','R'];
+  let seq = [];
+  const tlEl = document.getElementById('klm-tl');
+  const totalEl = document.getElementById('klm-total');
+  const expEl = document.getElementById('scen-exp');
+  const barWrap = document.getElementById('klm-bar-wrap');
+  const barEl = document.getElementById('klm-bar');
+  const legEl = document.getElementById('klm-legend');
+  const barTotal = document.getElementById('klm-bar-total');
+
+  function render(){
+    if(!seq.length){
+      tlEl.innerHTML = '<div class="empty">— timeline is empty. tap any operator above, or load a scenario below —</div>';
+      totalEl.textContent = '0.00s';
+      barWrap.classList.remove('on');
+      return;
+    }
+    let cum = 0;
+    tlEl.innerHTML = seq.map((o,i)=>{
+      cum += cost[o];
+      const last = i===seq.length-1 ? ' last' : '';
+      return `<div class="tok${last}" data-op="${o}">
+        <div class="num">${i+1}</div>
+        <div class="lt">${o}</div>
+        <div class="add">+${cost[o].toFixed(2)}s</div>
+        <div class="cum">${cum.toFixed(2)}s</div>
+      </div>`;
+    }).join('');
+    totalEl.textContent = cum.toFixed(2)+'s';
+    renderBar(cum);
+  }
+
+  function renderBar(total){
+    barWrap.classList.add('on');
+    barTotal.textContent = total.toFixed(2)+'s';
+    const counts = {K:0,P:0,H:0,M:0,R:0};
+    seq.forEach(o=>counts[o]++);
+    barEl.innerHTML = opOrder.filter(o=>counts[o]>0).map(o=>{
+      const contrib = counts[o]*cost[o];
+      const pct = (contrib/total)*100;
+      return `<div class="seg" data-op="${o}" style="width:${pct}%;" title="${o} × ${counts[o]} = ${contrib.toFixed(2)}s"></div>`;
+    }).join('');
+    legEl.innerHTML = opOrder.filter(o=>counts[o]>0).map(o=>{
+      const contrib = counts[o]*cost[o];
+      const pct = ((contrib/total)*100).toFixed(0);
+      return `<span class="li" data-op="${o}">
+        <span class="d"></span>${o} × ${counts[o]} = ${contrib.toFixed(2)}s <span class="pct">· ${pct}%</span>
+      </span>`;
+    }).join('');
+  }
+
+  function add(op){ seq.push(op); render(); }
+
+  document.querySelectorAll('.klm-op').forEach(op=>{
+    op.addEventListener('click',()=>{
+      op.classList.remove('hit'); void op.offsetWidth; op.classList.add('hit');
+      add(op.dataset.op);
+    });
+  });
+
+  document.getElementById('klm-undo').addEventListener('click',()=>{ seq.pop(); render(); });
+  document.getElementById('klm-clear').addEventListener('click',()=>{ seq=[]; render(); cancelScenario(); });
+
+  /* ===== guided scenarios ===== */
+  const scenarios = {
+    search: {
+      name: 'Search “HCI” on Google',
+      steps: [
+        {op:'M', why:'Decide what to search for — “HCI”.'},
+        {op:'P', why:'Move the cursor to the search box.'},
+        {op:'K', why:'Click into the search box.'},
+        {op:'K', why:'Type the letter <b>H</b>.'},
+        {op:'K', why:'Type the letter <b>C</b>.'},
+        {op:'K', why:'Type the letter <b>I</b>.'},
+        {op:'K', why:'Press <b>Enter</b> to submit.'},
+        {op:'R', why:'Wait for Google to return results.'},
+      ]
+    },
+    copy: {
+      name: 'Copy a URL into a chat message',
+      steps: [
+        {op:'M', why:'Decide which URL to share.'},
+        {op:'P', why:'Move to the address bar.'},
+        {op:'K', why:'Triple-click to select the entire URL.'},
+        {op:'K', why:'Press <b>⌘C</b> to copy.'},
+        {op:'P', why:'Move the cursor to the chat input.'},
+        {op:'K', why:'Click into the chat input.'},
+        {op:'K', why:'Press <b>⌘V</b> to paste.'},
+        {op:'K', why:'Press <b>Enter</b> to send.'},
+      ]
+    },
+    form: {
+      name: 'Fill & submit a sign-up form',
+      steps: [
+        {op:'M', why:'Read the form, decide what to enter first.'},
+        {op:'P', why:'Move to the “Name” field.'},
+        {op:'K', why:'Click into the field.'},
+        {op:'K', why:'Type a 5-letter name (counted once for brevity).'},
+        {op:'K', why:'Press <b>Tab</b> to jump to the next field.'},
+        {op:'K', why:'Type a 6-character password.'},
+        {op:'P', why:'Move the cursor to the <b>Submit</b> button.'},
+        {op:'K', why:'Click <b>Submit</b>.'},
+        {op:'R', why:'Wait for the server to confirm.'},
+      ]
+    },
+  };
+
+  let scenTimer = null, scenBtn = null;
+  function cancelScenario(){
+    if(scenTimer){ clearTimeout(scenTimer); scenTimer=null; }
+    if(scenBtn){ scenBtn.classList.remove('playing'); scenBtn=null; }
+  }
+
+  // render scenario cards with mix chips
+  function renderScenarios(){
+    const row = document.getElementById('scen-row');
+    row.innerHTML = Object.entries(scenarios).map(([id, s])=>{
+      const total = s.steps.reduce((a,st)=>a+cost[st.op],0);
+      const counts = {};
+      s.steps.forEach(st=>counts[st.op]=(counts[st.op]||0)+1);
+      const mix = opOrder.filter(o=>counts[o]).map(o=>`<span class="dot" data-op="${o}">${o}×${counts[o]}</span>`).join('');
+      return `<button class="scen" data-id="${id}">
+        <span class="scen-d">${s.steps.length} steps · ${total.toFixed(2)}s predicted</span>
+        <span class="scen-t">${s.name}</span>
+        <span class="mix">${mix}</span>
+      </button>`;
+    }).join('');
+    row.querySelectorAll('.scen').forEach(b=>{
+      b.addEventListener('click',()=>playScenario(b.dataset.id, b));
+    });
+  }
+
+  function playScenario(id, btn){
+    cancelScenario();
+    seq = []; render();
+    scenBtn = btn; btn.classList.add('playing');
+    const s = scenarios[id];
+    const n = s.steps.length;
+    let i = 0, cum = 0;
+
+    function pips(cur){
+      return `<div class="scen-progress">${
+        Array.from({length:n},(_,k)=>{
+          const cls = k<cur ? 'pip on' : (k===cur ? 'pip cur' : 'pip');
+          return `<span class="${cls}"></span>`;
+        }).join('')
+      }</div>`;
+    }
+
+    function next(){
+      if(i >= n){
+        expEl.innerHTML = `<div class="done">
+          ✓ Scenario complete
+          <small>${s.name} · predicted expert time <b style="color:var(--amber)">${cum.toFixed(2)}s</b> · ${n} operators</small>
+        </div>${pips(n)}`;
+        btn.classList.remove('playing'); scenBtn=null; scenTimer=null;
+        return;
+      }
+      const step = s.steps[i];
+      cum += cost[step.op];
+      seq.push(step.op); render();
+      // flash the matching operator button in the playground
+      const opBtn = document.querySelector(`.klm-op[data-op="${step.op}"]`);
+      if(opBtn){ opBtn.classList.remove('hit'); void opBtn.offsetWidth; opBtn.classList.add('hit'); }
+
+      expEl.innerHTML = `<div class="step">
+        <div class="glyph" data-op="${step.op}">${step.op}</div>
+        <div class="text">
+          <div class="meta">Step ${i+1} of ${n} · ${s.name}</div>
+          <div class="why">${step.why}</div>
+          <div class="num">+${cost[step.op].toFixed(2)}s &nbsp;·&nbsp; running total ${cum.toFixed(2)}s</div>
+        </div>
+      </div>${pips(i+1)}`;
+      i++;
+      scenTimer = setTimeout(next, 1200);
+    }
+    next();
+  }
+
+  renderScenarios();
+  render();
+})();
+
+/* ===== 7. COLOR CONTRAST ===== */
+(()=>{
+  function lum(hex){
+    const c = hex.substring(1).match(/.{2}/g).map(v=>parseInt(v,16)/255);
+    const t = c.map(v=> v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4));
+    return 0.2126*t[0]+0.7152*t[1]+0.0722*t[2];
+  }
+  function ratio(a,b){
+    const L1 = Math.max(lum(a),lum(b)), L2 = Math.min(lum(a),lum(b));
+    return (L1+0.05)/(L2+0.05);
+  }
+  const fg = document.getElementById('cc-fg'), bg = document.getElementById('cc-bg');
+  function update(){
+    const r = ratio(fg.value,bg.value);
+    document.getElementById('cc-ratio').textContent = r.toFixed(2)+':1';
+    document.getElementById('cc-preview').style.background = bg.value;
+    document.getElementById('cc-preview').style.color = fg.value;
+    const badges = document.getElementById('cc-badges');
+    const make = (label,pass) => `<span style="padding:4px 10px;border-radius:3px;font-size:11px;letter-spacing:.15em;background:${pass?'rgba(93,191,169,.15)':'rgba(233,112,112,.15)'};color:${pass?'var(--mint)':'var(--rose)'};border:1px solid ${pass?'var(--mint)':'var(--rose)'};">${pass?'PASS':'FAIL'}&nbsp;·&nbsp;${label}</span>`;
+    badges.innerHTML = [
+      ['AA · normal',r>=4.5],['AA · large',r>=3],
+      ['AAA · normal',r>=7],['AAA · large',r>=4.5]
+    ].map(p=>make(p[0],p[1])).join('');
+  }
+  fg.addEventListener('input',update); bg.addEventListener('input',update);
+  update();
+})();
+
+/* ===== 8. A11Y SIM ===== */
+(()=>{
+  const frame = document.getElementById('ax-frame');
+  const log = document.getElementById('sr-log');
+  const sr = document.getElementById('ax-sr'), hc = document.getElementById('ax-hc'), rm = document.getElementById('ax-rm'), cb = document.getElementById('ax-cb');
+  const ttsOK = 'speechSynthesis' in window;
+
+  let lastSpoken = '', lastTime = 0;
+  function speak(text){
+    if(!ttsOK || !sr.checked) return;
+    // de-dupe rapid duplicates (e.g. hover + focus on same element)
+    const now = performance.now();
+    if(text === lastSpoken && now - lastTime < 700) return;
+    lastSpoken = text; lastTime = now;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.1; u.pitch = 1; u.volume = 1;
+    window.speechSynthesis.speak(u);
+  }
+
+  function flush(t){
+    log.insertAdjacentHTML('beforeend','<div>› '+t+'</div>');
+    log.scrollTop = log.scrollHeight;
+    speak(t);
+  }
+
+  document.querySelectorAll('#ax-frame [data-aria]').forEach(el=>{
+    el.addEventListener('focus',()=>{ if(sr.checked) flush(el.dataset.aria); });
+    el.addEventListener('mouseenter',()=>{ if(sr.checked) flush(el.dataset.aria); });
+  });
+  hc.addEventListener('change',()=>frame.classList.toggle('hc',hc.checked));
+  rm.addEventListener('change',()=>{
+    document.documentElement.style.setProperty('scroll-behavior', rm.checked?'auto':'smooth');
+    document.querySelectorAll('*').forEach(el=>{ if(rm.checked) el.style.transition='none'; else el.style.transition=''; });
+  });
+  cb.addEventListener('change',()=>{
+    frame.style.filter = cb.checked
+      ? 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'p\'><feColorMatrix values=\'0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0\'/></filter></svg>#p")'
+      : '';
+  });
+  sr.addEventListener('change',()=>{
+    if(sr.checked){
+      const msg = ttsOK
+        ? '› narration enabled (audio + visual). tab through the form or hover any element. <span style="color:var(--amber)">turn up your volume.</span>'
+        : '› narration enabled (visual only). your browser does not support speech synthesis.';
+      log.innerHTML = '<div>'+msg+'</div>';
+      // greeting so the user immediately hears something
+      if(ttsOK){
+        setTimeout(()=>speak('Screen reader simulation enabled. Hover or tab through the form to hear each element.'), 100);
+      }
+    } else {
+      log.innerHTML = '<div>› narration disabled.</div>';
+      if(ttsOK) window.speechSynthesis.cancel();
+    }
+  });
+})();
+
+/* smooth anchor scroll */
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  const t = document.querySelector(a.getAttribute('href'));
+  if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth',block:'start'}); }
+}));
+</script>
+</body>
+</html>
