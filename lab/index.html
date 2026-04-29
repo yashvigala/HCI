@@ -724,7 +724,7 @@
             <button class="btn" data-door="bad" data-act="push">Push</button>
             <button class="btn" data-door="bad" data-act="pull">Pull</button>
           </div>
-          <p id="door-bad-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;height:18px;">handle says “grab me” — sign says “push.” which wins?</p>
+          <p id="door-bad-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;min-height:18px;">the handle says <i>grab me</i> · the sign says <i>push</i>. they disagree. which one will you trust?</p>
         </div>
       </div>
       <div class="col-6 rv">
@@ -741,7 +741,7 @@
             <button class="btn" data-door="good" data-act="push">Push</button>
             <button class="btn" data-door="good" data-act="pull">Pull</button>
           </div>
-          <p id="door-good-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;height:18px;">flat plate. nothing to grab. afford only one action.</p>
+          <p id="door-good-msg" style="color:var(--paper-dim);font-size:12px;margin-top:12px;min-height:18px;">flat plate · nothing to grab · no sign needed. the design itself answers the question.</p>
         </div>
       </div>
     </div>
@@ -1304,24 +1304,35 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
 /* ===== 4. NORMAN doors ===== */
 (()=>{
-  function bind(which, correct, msg){
+  function bind(which, correct, messages){
+    const el = messages.el;
     document.querySelectorAll(`[data-door="${which}"]`).forEach(b=>{
       b.addEventListener('click',()=>{
         const svg = document.getElementById('door-'+which);
-        if(b.dataset.act===correct){
+        const ok = b.dataset.act===correct;
+        if(ok){
           svg.animate([{transform:'rotateY(0)'},{transform:'rotateY(-30deg)'}],{duration:600,fill:'forwards',easing:'cubic-bezier(.2,.7,.3,1)'});
-          msg.textContent = `correct — door is ${correct} type. you used the affordance, not the sign.`;
-          msg.style.color = 'var(--mint)';
+          el.innerHTML = messages.correct;
+          el.style.color = 'var(--mint)';
         }else{
           svg.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:300});
-          msg.textContent = `wrong — but you trusted the handle. that's the bug.`;
-          msg.style.color = 'var(--rose)';
+          el.innerHTML = messages.wrong;
+          el.style.color = 'var(--rose)';
         }
       });
     });
   }
-  bind('bad','pull', document.getElementById('door-bad-msg'));
-  bind('good','push', document.getElementById('door-good-msg'));
+
+  bind('bad','pull', {
+    el: document.getElementById('door-bad-msg'),
+    correct: '✓ <b>pull worked</b> — even though the sign said PUSH. you trusted the <b>handle</b> (the affordance) over the <b>label</b>. norman: if a door needs a sign, the design has already failed.',
+    wrong: '✗ door wouldn\'t budge. you obeyed the <b>PUSH</b> sign — but the handle was begging to be pulled. that conflict <i>is</i> the bug. real norman doors are exactly this confused.'
+  });
+  bind('good','push', {
+    el: document.getElementById('door-good-msg'),
+    correct: '✓ <b>push worked</b> — and there was no sign. the flat plate itself told you the answer. this is what good affordance looks like.',
+    wrong: '✗ nothing to grab here. the door\'s design never suggested pulling. try <b>push</b>.'
+  });
 })();
 
 /* ===== 4b. STOVE mapping ===== */
